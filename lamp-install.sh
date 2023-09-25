@@ -345,7 +345,7 @@ uninstall_mysql () {
 # This function reboots the system
 system_reboot () {
     echo "Rebooting the system... "
-    sudo reboot
+    sudo reboot now
 
     
 }
@@ -358,22 +358,24 @@ lamp_php_uninstall () {
     uninstall_php
     uninstall_mysql
 
-    read -p "It is recommended to reboot your system. ${yellow}Do you want to reboot your system now?[y|n]${clear}" rebootvar
-    while [ $rebootvar != 'y' || $rebootvar != 'Y' || $rebootvar != 'n' || $rebootvar != 'N']
+    read -p "It is recommended to reboot your system. Do you want to reboot your system now?[y|n]" rebootvar
+    while [[ $rebootvar != 'y' && $rebootvar != 'Y' && $rebootvar != 'n' && $rebootvar != 'N']]
     do
-        case $rebootvar in
-        y|Y)
-            system_reboot 
-            ;;
-        n|N)
-            echo "Please manually reboot your system later"
-            exit
-            ;;
-        *)
-        read -p "It is recommended to reboot your system. ${yellow}Do you want to reboot your system now?[y|n]${clear}" : rebootvar
-        ;;
-        esac
+        echo -e ${red}You must choose y/n only.${clear}
+        read -p "It is recommended to reboot your system. Do you want to reboot your system now?[y|n]" rebootvar
     done
+
+    case $rebootvar in
+    y|Y)
+        echo "Rebooting system..."
+        system_reboot 
+        ;;
+    n|N)
+        echo -e "${yellow} It is recommended to reboot your system. Please manually reboot your system later.${clear}"
+        echo -e "${green} Uninstalling done~${clear}"
+        clear
+        exit
+
 }
 #------------------------------------------------------------------------------
 

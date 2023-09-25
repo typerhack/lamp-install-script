@@ -32,6 +32,7 @@ sudo bash lamp-install.sh
 4- Added OS type check for wsl and ubunto based distros.
 5- Added support for installing VSCode
 6- Fixed bug for vscode running/installation
+7- Fixed system reboot
 
 ### v0.1
 raw initialisation of script
