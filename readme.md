@@ -15,9 +15,10 @@ sudo bash lamp-install.sh
 ```
 
 When asked for phpmyadmin use following configs:
-> Use apache2
-> Configure db with dbconfig-common: Yes
-> Random password (leave password blank)
+> Use apache2 <br>
+> Configure db with dbconfig-common: Yes <br>
+> Random password (leave password blank)<br>
+> If any error occured choos : iqnore<br>
 
 ## Tested on:
 1- win 10 - ubuntu wsl 2 <br>
@@ -37,7 +38,7 @@ When asked for phpmyadmin use following configs:
 
 ## logs:
 
-### v0.27
+### v0.27.1
 1- Fixed problem with text log<br>
 2- Fixed problem for databas<br>
 3- Added exit option to the script<br>

@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.27"
+script_version="0.27.1"
 
 #------------------------------------------------------------------------------
 
@@ -99,8 +99,13 @@ checkPassword () {
         echo
         echo -e ${green}Passwords matched.${clear}
         echo -e ${yellow}changing mysql root account password...${clear}
-        sudo mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';" 
-        sudo mysql -uroot -ppassword -e"FLUSH PRIVILEGES;"
+        sudo mysql -uroot -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';" 
+
+        if [ $? -eq 0 ]
+        then
+        echo "${green}root user password changed. make sure to remember your password.${clear}"
+
+        sudo mysql -uroot -p$passvar -e"FLUSH PRIVILEGES;"
 
         echo -e "${yellow}Removing root user limits...${clear}"
         sudo mysql -uroot -ppassword -e"UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root'; FLUSH PRIVILEGES;"
@@ -222,37 +227,39 @@ install_vscode () {
 # This function create a database with associated agent in mysql
 create_database_agent_mysql () {
 
-    echo -e "${yellow}Please enter a new username for MySQL:${clear}"
-    read -p "New username: " newusermysql
+    echo -e ${yellow}Please enter a new username for mysql:${clear}
+    read -p "New username:" newusermysql
 
-    echo -e "${yellow}Please specify a password for your account:${clear}"
-    read -s -p "New user password: " newusermysqlpass
-    echo
+    new_mysql_user_pass () {
+        echo -e ${yellow}Please specify a password for your root account:${clear}
+        read -sp "New user password:" newusermysqlpass
+        echo
+        read -sp "confirm password:" newusermysqlpassconfirm
+        echo
+        echo ${yellow}What is your root account password:${clear}
+        read -sp "root account password:" rootuserpass
 
-    echo -e "${yellow}Please confirm the password:${clear}"
-    read -s -p "Confirm password: " newusermysqlpassconfirm
-    echo
-
-    while [ "$newusermysqlpass" != "$newusermysqlpassconfirm" ]
+    }
+    new_mysql_user_pass
+    
+    while [ $newusermysqlpass != $newusermysqlpassconfirm ]
     do
-        echo "${yellow}Passwords do not match.${clear}"
-        read -s -p "New user password: " newusermysqlpass
-        echo
-
-        echo "${yellow}Please confirm the password:${clear}"
-        read -s -p "Confirm password: " newusermysqlpassconfirm
-        echo
+        echo ${yellow}Password do not match....${clear}
+        new_mysql_user_pass
     done
     
-    if [ "$newusermysqlpass" = "$newusermysqlpassconfirm" ]
+    if [ $newusermysqlpass = $newusermysqlpassconfirm ]
     then
-        echo -e "${yellow}Creating MySQL user...${clear}" 
-        sudo mysql -u root -p -e "CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$newusermysqlpass';"
-        sudo mysql -u root -p -e "GRANT ALL PRIVILEGES ON yourdatabase.* TO '$newusermysql'@'localhost';"
-        sudo mysql -u root -p -e "FLUSH PRIVILEGES;"
+        echo -e ${yellow}creating phpmyadmin user...${clear} 
+        sudo mysql -uroot -p$rootuserpass -e"CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$newusermysqlpass';"
+        sudo mysql -uroot -p$rootuserpass -e"GRANT ALL PRIVILEGES ON yourdatabase.* TO 'phpmyadminuser'@'localhost';"
+        sudo mysql -uroot -p$rootuserpass -e"FLUSH PRIVILEGES;"
         
         service_restart
     fi
+
+
+    
 }
 
 
@@ -434,7 +441,7 @@ lamp_php_uninstall () {
 
 echo -e "${yellow}This script will let you install LAMP with phpmyadmin.\nPlease choose your desired action:${clear}\n"
 
-echo -e "${green}The script version is:$script_version${clear}"
+echo -e "${green}The script version is: $script_version${clear}"
 
 echo -e "1- Installing LAMP with phpmyadmin\n"
 echo -e "2- Uninstalling the LAMP with phpmy admin\n"
