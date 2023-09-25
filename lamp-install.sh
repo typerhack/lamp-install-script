@@ -26,7 +26,7 @@ sys_update () {
 
 lamp_install () {
     echo "installing LAMP now..."
-    sudo apt-get install lamp-server^
+    sudo apt install lamp-server^ -y
 
     # Editing apache2.conf
     echo Adding necessary lines to apache2.conf.
@@ -173,7 +173,8 @@ run_vscode () {
 
 # This function create a database with associated agent in mysql
 create_database_agent_mysql () {
-
+    echo "This feature is not implemented yet. please choose other options."
+    exit
 }
 
 
@@ -210,7 +211,7 @@ lamp_php_install () {
     echo "${green}LAMP successfully installed!${clear}"
 
     # 10- Running vs code server
-    read -p "${yellow}Do you want to run VS code?[y/n]${clear}" : vscode_answer
+    read -p "${yellow}Do you want to run VS code?[y/n]${clear}"  vscode_answer
     while [ $vscode_answer != 'y' || $vscode_answer != 'Y' || $vscode_answer != 'n' || $vscode_answer != 'N']
     do
         case $vscode_answer in
@@ -239,9 +240,9 @@ git_uninstall (){
 uninstall_apache2 () {
     echo "Removing apache2 and it's component..."
     sudo service apache2 stop
-    sudo apt-get purge apache2 apache2-utils apache2.2-bin 
-    sudo apt remove apache2.*
-    sudo apt-get autoremove
+    sudo apt-get purge apache2 apache2-utils apache2.2-bin  -y
+    sudo apt remove apache2.* -y
+    sudo apt-get autoremove -y
     whereis apache2
     sudo rm -rf /etc/apache2
     echo "Done!"
@@ -251,9 +252,9 @@ uninstall_apache2 () {
 uninstall_php () {
     echo "Removing PHP and it's compinent..."
     php --version
-    sudo apt-get purge `dpkg -l | grep php8.0| awk '{print $2}' |tr "\n" " "`
-    sudo apt-get purge php8.*
-    sudo apt-get autoremove --purge
+    sudo apt-get purge `dpkg -l | grep php8.0| awk '{print $2}' |tr "\n" " "` -y
+    sudo apt-get purge php8.* -y
+    sudo apt-get autoremove --purge -y
     whereis php
     sudo rm -rf /etc/php
     sudo apt update -y
@@ -266,11 +267,11 @@ uninstall_php () {
 uninstall_mysql () {
     echo "Removing mysql and it's component..."
     sudo service mysql stop
-    sudo apt-get remove --purge *mysql\*
+    sudo apt-get remove --purge *mysql\* -y
     sudo apt-get remove --purge mysql-server mysql-client mysql-common -y
     sudo rm -rf /etc/mysql
-    sudo apt-get autoremove
-    sudo apt-get autoclean
+    sudo apt-get autoremove -y
+    sudo apt-get autoclean -y
     echo "Done!"
 }
 
@@ -290,7 +291,7 @@ lamp_php_uninstall () {
     uninstall_php
     uninstall_mysql
 
-    read -p "It is recommended to reboot your system. ${yellow}Do you want to reboot your system now?[y|n]${clear}" : rebootvar
+    read -p "It is recommended to reboot your system. ${yellow}Do you want to reboot your system now?[y|n]${clear}" rebootvar
     while [ $rebootvar != 'y' || $rebootvar != 'Y' || $rebootvar != 'n' || $rebootvar != 'N']
     do
         case $rebootvar in
@@ -320,7 +321,7 @@ echo -e "7- Run VSCode\n"
 echo -e "8- Reboot system\n"
 echo
 
-read -s "Choose your option:" option
+read -p "Choose your option:" option
 
 case $option in
     1)
