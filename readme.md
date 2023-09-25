@@ -43,6 +43,7 @@ sudo bash lamp-install.sh
 10- Fixed text colors for log<br>
 11- Edited query for mysql root password change <br>
 12- Fixing Problem for gitweb<br>
+13- Removed update and upgrade from uninstalling php<br>
 
 ### v0.1
 raw initialisation of script<br>

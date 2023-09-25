@@ -199,7 +199,7 @@ run_vscode () {
 # This function installs vscode
 install_vscode () {
     echo ${yellow}Installing VSCode....${clear}
-    
+
     sudo apt purge gitweb -y
     sudo apt install gitweb -y
 
@@ -226,15 +226,19 @@ create_database_agent_mysql () {
 
 # This function install LAMP, phpmyadmin and git
 lamp_php_install () {
+    
     # 1- Upgrading system
     sys_update
 
     # 2- Installing LAMP
+    # In order to prevent problems with gitweb we need to install git web after apache2
+    sudo apt purge gitweb -y
     lamp_install
+    sudo apt install gitweb -y
 
     # 3- Restarting installed services
     service_restart
-
+    
     # 4- Creating test file
     create_test_file
 
@@ -252,6 +256,7 @@ lamp_php_install () {
 
     # 9- Installing git
     git_install
+    
 
     echo -e "${green}LAMP successfully installed!${clear}"
 
@@ -293,7 +298,7 @@ lamp_php_install () {
             install_vscode
             ;;
         n|N)
-            echo "Done. Enjoy developing for web."
+            echo -e "${green}Done. Enjoy developing for web.${clear}"
             ;;
         esac        
         ;;
@@ -331,8 +336,6 @@ uninstall_php () {
     sudo apt-get autoremove --purge -y
     whereis php
     sudo rm -rf /etc/php
-    sudo apt update -y
-    sudo apt upgrade -y
     php --version
     echo "Done!"
 }
@@ -352,9 +355,7 @@ uninstall_mysql () {
 # This function reboots the system
 system_reboot () {
     echo "Rebooting the system... "
-    sudo reboot now
-
-    
+    sudo reboot now   
 }
 
 uninstall_vscode () {
