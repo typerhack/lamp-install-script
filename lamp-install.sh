@@ -199,6 +199,10 @@ run_vscode () {
 # This function installs vscode
 install_vscode () {
     echo ${yellow}Installing VSCode....${clear}
+    
+    sudo apt purge gitweb -y
+    sudo apt install gitweb -y
+
     sudo apt install wget gpg -y
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
     sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
