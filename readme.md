@@ -44,6 +44,8 @@ sudo bash lamp-install.sh
 11- Edited query for mysql root password change <br>
 12- Fixing Problem for gitweb<br>
 13- Removed update and upgrade from uninstalling php<br>
+14- Fixed problem with password changing query<br>
+15- Added support for removing symbolic link whil uninstalling LAMP <br>
 
 ### v0.1
 raw initialisation of script<br>

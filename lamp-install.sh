@@ -100,7 +100,7 @@ checkPassword () {
         echo -e ${green}Passwords matched.${clear}
         echo -e ${yellow}changing mysql root account password...${clear}
         echo
-        mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY $passvar;"
+        mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';"
     fi
 }
 
@@ -168,10 +168,10 @@ phpmyadmin_install () {
 
 # Add projects shortcut to home as a symbolic link
 create_project_shortcut () {
-    echo ${cyan}Adding webdev shortcuts to home as a ${yellow}symbolic link${clear}.
+    echo -e ${cyan}Adding webdev shortcuts to home as a ${yellow}symbolic link${clear}.
     ln -s /var/www/html ~/webdev
-    echo "${green}You can now access your file via webdev folder.${clear}"
-    echo "Done!"
+    echo -e "${green}You can now access your file via webdev folder.${clear}"
+    echo -e "Done!"
 }
 
 # This function adds necessary user premissions to current user
@@ -367,6 +367,9 @@ lamp_php_uninstall () {
     uninstall_apache2
     uninstall_php
     uninstall_mysql
+
+    #removing project shortcut
+    rm ~/webdev
 
     echo -e "${yellow}It is recommended to reboot your system. Do you want to reboot your system now?[y|n]${clear}"
     read -p "Reboot now?[y|n]" rebootvar
