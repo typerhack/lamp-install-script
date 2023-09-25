@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.27.1"
+script_version="0.27.2"
 
 #------------------------------------------------------------------------------
 
@@ -99,17 +99,8 @@ checkPassword () {
         echo
         echo -e ${green}Passwords matched.${clear}
         echo -e ${yellow}changing mysql root account password...${clear}
-        sudo mysql -uroot -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';" 
-
-        if [ $? -eq 0 ]
-        then
-        echo "${green}root user password changed. make sure to remember your password.${clear}"
-
-        sudo mysql -uroot -p$passvar -e"FLUSH PRIVILEGES;"
-
         echo -e "${yellow}Removing root user limits...${clear}"
-        sudo mysql -uroot -ppassword -e"UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root'; FLUSH PRIVILEGES;"
-
+        sudo mysql -uroot -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root';FLUSH PRIVILEGES;" 
         echo "Done!"
 
         service_restart
@@ -180,8 +171,8 @@ phpmyadmin_install () {
 
 # Add projects shortcut to home as a symbolic link
 create_project_shortcut () {
-    echo -e ${cyan}Adding webdev shortcuts to home as a ${yellow}symbolic link${clear}.
-    ln -s /var/www/html $HOME/webdev
+    echo -e ${cyan}Adding webdev shortcuts to home as a symbolic link${clear}.
+    sudo ln -s /var/www/html $HOME/webdev
     echo -e "${green}You can now access your file via webdev folder.${clear}"
     echo -e "Done!"
 }
@@ -236,24 +227,23 @@ create_database_agent_mysql () {
         echo
         read -sp "confirm password:" newusermysqlpassconfirm
         echo
-        echo ${yellow}What is your root account password:${clear}
-        read -sp "root account password:" rootuserpass
+        
 
     }
     new_mysql_user_pass
     
     while [ $newusermysqlpass != $newusermysqlpassconfirm ]
     do
-        echo ${yellow}Password do not match....${clear}
+        echo -e ${yellow}Password do not match....${clear}
         new_mysql_user_pass
     done
     
     if [ $newusermysqlpass = $newusermysqlpassconfirm ]
     then
+        echo ${yellow}What is your root account password:${clear}
+        read -sp "root account password:" rootuserpass
         echo -e ${yellow}creating phpmyadmin user...${clear} 
-        sudo mysql -uroot -p$rootuserpass -e"CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$newusermysqlpass';"
-        sudo mysql -uroot -p$rootuserpass -e"GRANT ALL PRIVILEGES ON yourdatabase.* TO 'phpmyadminuser'@'localhost';"
-        sudo mysql -uroot -p$rootuserpass -e"FLUSH PRIVILEGES;"
+        sudo mysql -uroot -p$rootuserpass -e"CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$newusermysqlpass';GRANT ALL PRIVILEGES ON yourdatabase.* TO 'phpmyadminuser'@'localhost';FLUSH PRIVILEGES;"
         
         service_restart
     fi
@@ -445,7 +435,7 @@ echo -e "${green}The script version is: $script_version${clear}"
 
 echo -e "1- Installing LAMP with phpmyadmin\n"
 echo -e "2- Uninstalling the LAMP with phpmy admin\n"
-echo -e "3- Creating a database with agent in mysql\n"
+echo -e "3- ADd new user to mysql\n"
 echo -e "4- Changing mysql root password\n"
 echo -e "5- Installing git only\n"
 echo -e "6- Restart Services\n"
