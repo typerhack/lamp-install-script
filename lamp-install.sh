@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.24"
+script_version="0.25"
 
 #------------------------------------------------------------------------------
 
@@ -207,6 +207,7 @@ install_vscode () {
     sudo apt install apt-transport-https -y
     sudo apt update
     sudo apt install code -y
+    echo -e "${green}You can now use vscode type'code' in terminal to open the program.${clear}"
     echo "Done!"
 }
 
@@ -350,6 +351,12 @@ system_reboot () {
     sudo reboot now
 
     
+}
+
+uninstall_vscode () {
+    echo ${yellow}Uninstalling VSCode...${clear}
+    sudo apt remove code -y
+    echo "Done!"
 }
 
 
