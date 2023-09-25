@@ -108,6 +108,9 @@ checkPassword () {
         sudo mysql -uroot -ppassword -e"FLUSH PRIVILEGES;"
         echo "${green}'phpmyadmin' user created using the same password you provided for root user.${clear}"
 
+        sudo sed -i "s/\(password\s*=\s*\).*$/\1$passvar/" /etc/mysql/debian.cnf
+        echo "debian-sys-maint user pass changed."
+
     fi
 }
 
@@ -176,7 +179,7 @@ phpmyadmin_install () {
 # Add projects shortcut to home as a symbolic link
 create_project_shortcut () {
     echo -e ${cyan}Adding webdev shortcuts to home as a ${yellow}symbolic link${clear}.
-    ln -s /var/www/html ~/webdev
+    ln -s /var/www/html $HOME/webdev
     echo -e "${green}You can now access your file via webdev folder.${clear}"
     echo -e "Done!"
 }

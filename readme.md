@@ -37,6 +37,8 @@ sudo bash lamp-install.sh
 2- Fixed problem for databas<br>
 3- Added exit option to the script<br>
 4- Added support for phpmyadmin user<br>
+5- Fixed $HOME address for the script<br>
+6- changing debian-sys-maint password to the user input<br>
 
 ### v0.25:
 1- Fixed input for the user<br>
