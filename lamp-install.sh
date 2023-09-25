@@ -375,6 +375,7 @@ lamp_php_uninstall () {
         echo -e "${green} Uninstalling done~${clear}"
         clear
         exit
+    esac
 
 }
 #------------------------------------------------------------------------------
