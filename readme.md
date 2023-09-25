@@ -14,6 +14,11 @@ Then run:
 sudo bash lamp-install.sh
 ```
 
+When asked for phpmyadmin use following configs:
+> Use apache2
+> Configure db with dbconfig-common: Yes
+> Random password (leave password blank)
+
 ## Tested on:
 1- win 10 - ubuntu wsl 2 <br>
 2- ubuntu 22.04<br>
@@ -27,18 +32,19 @@ sudo bash lamp-install.sh
 ## To do:
 1- Must add support for OS differentiation<br>
 2- Must add database, table and agent creation in mysql<br>
-3- Adding support for wordpress installation
+3- Adding support for wordpress installation<br>
 
 
 ## logs:
 
-### v0.26
+### v0.27
 1- Fixed problem with text log<br>
 2- Fixed problem for databas<br>
 3- Added exit option to the script<br>
-4- Added support for phpmyadmin user<br>
-5- Fixed $HOME address for the script<br>
-6- changing debian-sys-maint password to the user input<br>
+4- Fixed $HOME address for the script<br>
+5- Removing limits for root user to access phpmyadmin panel<br>
+6- added support for creating new user - not fully completed<br>
+
 
 ### v0.25:
 1- Fixed input for the user<br>

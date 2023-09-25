@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.26"
+script_version="0.27"
 
 #------------------------------------------------------------------------------
 
@@ -102,15 +102,12 @@ checkPassword () {
         sudo mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';" 
         sudo mysql -uroot -ppassword -e"FLUSH PRIVILEGES;"
 
-        echo -e ${yellow}creating phpmyadmin user...${clear} 
-        sudo mysql -uroot -ppassword -e"CREATE USER 'phpmyadminuser'@'localhost' IDENTIFIED BY '$passvar';"
-        sudo mysql -uroot -ppassword -e"GRANT ALL PRIVILEGES ON yourdatabase.* TO 'phpmyadminuser'@'localhost';"
-        sudo mysql -uroot -ppassword -e"FLUSH PRIVILEGES;"
-        echo "${green}'phpmyadmin' user created using the same password you provided for root user.${clear}"
+        echo -e "${yellow}Removing root user limits...${clear}"
+        sudo mysql -uroot -ppassword -e"UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root'; FLUSH PRIVILEGES;"
 
-        sudo sed -i "s/\(password\s*=\s*\).*$/\1$passvar/" /etc/mysql/debian.cnf
-        echo "debian-sys-maint user pass changed."
+        echo "Done!"
 
+        service_restart
     fi
 }
 
@@ -224,9 +221,40 @@ install_vscode () {
 
 # This function create a database with associated agent in mysql
 create_database_agent_mysql () {
-    echo "This feature is not implemented yet. please choose other options."
-    exit
+
+    echo -e "${yellow}Please enter a new username for MySQL:${clear}"
+    read -p "New username: " newusermysql
+
+    echo -e "${yellow}Please specify a password for your account:${clear}"
+    read -s -p "New user password: " newusermysqlpass
+    echo
+
+    echo -e "${yellow}Please confirm the password:${clear}"
+    read -s -p "Confirm password: " newusermysqlpassconfirm
+    echo
+
+    while [ "$newusermysqlpass" != "$newusermysqlpassconfirm" ]
+    do
+        echo "${yellow}Passwords do not match.${clear}"
+        read -s -p "New user password: " newusermysqlpass
+        echo
+
+        echo "${yellow}Please confirm the password:${clear}"
+        read -s -p "Confirm password: " newusermysqlpassconfirm
+        echo
+    done
+    
+    if [ "$newusermysqlpass" = "$newusermysqlpassconfirm" ]
+    then
+        echo -e "${yellow}Creating MySQL user...${clear}" 
+        sudo mysql -u root -p -e "CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$newusermysqlpass';"
+        sudo mysql -u root -p -e "GRANT ALL PRIVILEGES ON yourdatabase.* TO '$newusermysql'@'localhost';"
+        sudo mysql -u root -p -e "FLUSH PRIVILEGES;"
+        
+        service_restart
+    fi
 }
+
 
 
 
