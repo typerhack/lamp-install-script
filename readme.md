@@ -29,7 +29,8 @@ sudo bash lamp-install.sh
 
 
 ## logs:
-### v0.2:
+
+### v0.24:
 1- Fixed input for the user<br>
 2- Made lamp install automatic no need for user to add anything<br>
 3- Made uninstll process automatic in some parts.<br>
@@ -38,6 +39,9 @@ sudo bash lamp-install.sh
 6- Fixed bug for vscode running/installation<br>
 7- Fixed system reboot<br>
 8- Fixed info.php test creation file<br>
+1- Fixed bugs for adding necessary configs to apache2.conf<br>
+2- Fixed text colors for log<br>
+3- Edited query for mysql root password change <br>
 
 ### v0.1
 raw initialisation of script<br>

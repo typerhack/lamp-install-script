@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.23"
+script_version="0.24"
 
 #------------------------------------------------------------------------------
 
@@ -50,37 +50,37 @@ esac
 
 # System Update
 sys_update () {
-    echo "Upgrading system..."
+    echo -e ${cyan}"Upgrading system..."${clear}
     sudo apt update && sudo apt upgrade -y
-    echo ${green}System updated.${clear}
+    echo -e ${green}System updated.${clear}
 }
 
 lamp_install () {
-    echo "installing LAMP now..."
+    echo -e ${yellow}Installing LAMP now...${clear}
     sudo apt install lamp-server^ -y
 
     # Editing apache2.conf
-    echo Adding necessary lines to apache2.conf.
-    echo -e "Servername localhost\nAcceptFilter http none\nAcceptFilter https none" >> /etc/apache2/apache2.conf
+    echo -e ${yellow}Adding necessary lines to apache2.conf.${clear}
+    echo -e "Servername localhost\nAcceptFilter http none\nAcceptFilter https none" > /etc/apache2/apache2.conf
 
-    echo ${green}LAMP installed.${clear}
+    echo -e ${green}LAMP installed.${clear}
 }
 
 # This function restarts the necessary services
 service_restart () {
-    echo Restarting services...
-    echo ${yellow}Restarting apache2...${clear}
+    echo -e ${cyan}Restarting services...${clear}
+    echo -e ${yellow}Restarting apache2...${clear}
     sudo systemctl restart apache2
-    echo ${green}apache2 restarted.${clear}
-    echo ${yellow}Restarting mysql.service...${clear}
+    echo -e ${green}apache2 restarted.${clear}
+    echo -e ${yellow}Restarting mysql.service...${clear}
     sudo systemctl restart mysql.service
-    echo ${green}mysql.service restarted.${clear}
+    echo -e ${green}mysql.service restarted.${clear}
     echo "Done!"
 }
 
 # This function creates a test file
 create_test_file () {
-echo Creating test file...
+    echo -e ${cyan}Creating test file...${clear}
     touch /var/www/html/info.php
     echo -e "<?php\nphpinfo();\n?>" > /var/www/html/info.php
     echo -e To check your test file please visit the following address: ${green}localhost/info.php${clear}
@@ -99,23 +99,20 @@ checkPassword () {
     then
         echo
         echo -e ${green}Passwords matched.${clear}
-        echo changing mysql root account password...
+        echo -e ${yellow}changing mysql root account password...${clear}
         echo
-        mysql -uroot -ppassword -e"ALTER USER 'username'@'localhost' IDENTIFIED BY $passvar;"
+        mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY $passvar;"
     fi
 }
 
 # This function changes the password for root username for the first time
 change_root_pass () {
-    echo -e "you must change mysql root account password."
-
-    
+    echo -e "${yellow}You must change mysql root account password."${clear}
 
     checkPassword
     while [ $passvar != $passvarconfirm ]
     do
         echo -e ${red}Passwords did not match...${clear}
-        echo
         echo
         checkPassword
     done
@@ -160,7 +157,7 @@ change_root_pass_brute () {
 
 # This function installs phpmyadmin and changes necessary configs
 phpmyadmin_install () {
-    echo -e "Installing phpmyadmin..."
+    echo -e "${cyan}Installing phpmyadmin...${clear}"
     sudo apt-get install -y phpmyadmin
 
     # Adding phpmyadmin to apache2
@@ -172,7 +169,7 @@ phpmyadmin_install () {
 
 # Add projects shortcut to home as a symbolic link
 create_project_shortcut () {
-    echo Adding webdev shortcuts to home as a ${yellow}symbolic link${clear}.
+    echo ${cyan}Adding webdev shortcuts to home as a ${yellow}symbolic link${clear}.
     ln -s /var/www/html ~/webdev
     echo "${green}You can now access your file via webdev folder.${clear}"
     echo "Done!"
@@ -180,29 +177,29 @@ create_project_shortcut () {
 
 # This function adds necessary user premissions to current user
 add_user_premission () {
-    echo Adding necessary permissions to user...
+    echo ${yellow}Adding necessary permissions to user...${clear}
     sudo chown -R $USER /var/www/html/
     echo "Done!"
 }
 
 # This Function installs git
 git_install () {
-    echo Installing git
+    echo ${yellow}Installing git${clear}
     sudo apt install git-all -y
     echo "Done!"
 }
 
 # This function runs vscode
 run_vscode () {
-    echo "Running VSCode server..."
+    echo "${yellow}Running VSCode server...${clear}"
     cd webdev
     code .
 }
 
 # This function installs vscode
 install_vscode () {
-    echo Installing VSCode....
-    sudo apt-get install wget gpg -y
+    echo ${yellow}Installing VSCode....${clear}
+    sudo apt install wget gpg -y
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
     sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
     sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
