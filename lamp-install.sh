@@ -361,8 +361,8 @@ lamp_php_uninstall () {
     read -p "It is recommended to reboot your system. Do you want to reboot your system now?[y|n]" rebootvar
     while [[ $rebootvar != 'y' && $rebootvar != 'Y' && $rebootvar != 'n' && $rebootvar != 'N' ]]
     do
-        echo -e ${red}You must choose y/n only.${clear}
-        read -p "It is recommended to reboot your system. Do you want to reboot your system now?[y|n]" rebootvar
+        echo -e "${red}You must choose y/n only.${clear}"
+        read -p "It is recommended to reboot your system. Do you want to reboot your system now?[y|n] " rebootvar
     done
 
     case $rebootvar in
