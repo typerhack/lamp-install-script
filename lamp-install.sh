@@ -229,11 +229,8 @@ lamp_php_install () {
     # 1- Upgrading system
     sys_update
 
-    # 2- Installing LAMP
-    # In order to prevent problems with gitweb we need to install git web after apache2
-    sudo apt purge gitweb -y
+    # 2- Installing LAMP    
     lamp_install
-    sudo apt install gitweb -y
 
     # 3- Restarting installed services
     service_restart
