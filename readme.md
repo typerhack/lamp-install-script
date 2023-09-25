@@ -14,7 +14,7 @@ sudo bash lamp-install.sh
 ```
 
 ## Tested on:
-1- win 10 - ubuntu wsl 2
+1- win 10 - ubuntu wsl 2 <br>
 2- ubuntu 22.04
 3- bodhi linux 7.0.0
 
