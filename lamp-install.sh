@@ -61,8 +61,7 @@ lamp_install () {
 
     # Editing apache2.conf
     echo -e ${yellow}Adding necessary lines to apache2.conf.${clear}
-    echo -e "Servername localhost\nAcceptFilter http none\nAcceptFilter https none" > /etc/apache2/apache2.conf
-
+    echo -e "Servername localhost\nAcceptFilter http none\nAcceptFilter https none" >> /etc/apache2/apache2.conf
     echo -e ${green}LAMP installed.${clear}
 }
 
