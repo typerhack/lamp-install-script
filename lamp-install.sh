@@ -99,8 +99,15 @@ checkPassword () {
         echo
         echo -e ${green}Passwords matched.${clear}
         echo -e ${yellow}changing mysql root account password...${clear}
-        echo
         sudo mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';" 
+        sudo mysql -uroot -ppassword -e"FLUSH PRIVILEGES;"
+
+        echo -e ${yellow}creating phpmyadmin user...${clear} 
+        sudo mysql -uroot -ppassword -e"CREATE USER 'phpmyadminuser'@'localhost' IDENTIFIED BY '$passvar';"
+        sudo mysql -uroot -ppassword -e"GRANT ALL PRIVILEGES ON yourdatabase.* TO 'phpmyadminuser'@'localhost';"
+        sudo mysql -uroot -ppassword -e"FLUSH PRIVILEGES;"
+        echo "${green}'phpmyadmin' user created using the same password you provided for root user.${clear}"
+
     fi
 }
 
@@ -406,9 +413,9 @@ echo -e "5- Installing git only\n"
 echo -e "6- Restart Services\n"
 echo -e "7- Run VSCode\n"
 echo -e "8- Reboot system\n"
-echo -e "9- Installing VSCode"
+echo -e "9- Installing VSCode\n"
 
-echo -e "q- Exit"
+echo -e "q- Exit\n"
 echo
 
 read -p "Choose your option:" option
