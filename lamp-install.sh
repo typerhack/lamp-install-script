@@ -2,6 +2,12 @@
 
 # Give the necessary premisions to the file using "chmod +x lamp-install.sh"
 # To run the script use "sudo ./lamp-install.sh"
+
+#------------------------------------------------------------------------------
+
+# Script Version
+script_version="0.23"
+
 #------------------------------------------------------------------------------
 
 # Color variables
@@ -75,9 +81,8 @@ service_restart () {
 # This function creates a test file
 create_test_file () {
 echo Creating test file...
-    php_info_file="<?php\nphpinfo();\n?>"
     touch /var/www/html/info.php
-    echo $php_info_file >> /var/www/html/info.php
+    echo -e "<?php\nphpinfo();\n?>" > /var/www/html/info.php
     echo -e To check your test file please visit the following address: ${green}localhost/info.php${clear}
     echo "Done!"
 }
@@ -246,7 +251,7 @@ lamp_php_install () {
     # 9- Installing git
     git_install
 
-    echo "${green}LAMP successfully installed!${clear}"
+    echo -e "${green}LAMP successfully installed!${clear}"
 
     # 10- Running vs code server
     case $os_type in
@@ -263,7 +268,7 @@ lamp_php_install () {
         case $vscode_answer in
         y|Y)
             echo "Running VS Code server..."
-            # run_vscode
+            run_vscode
             ;;
         n|N)
             echo "Done. Enjoy developing for web."
@@ -283,7 +288,7 @@ lamp_php_install () {
         case $vscode_install in
         y|Y)
             echo "Installing VS Code..."
-            # install_vscode
+            install_vscode
             ;;
         n|N)
             echo "Done. Enjoy developing for web."
@@ -353,7 +358,7 @@ system_reboot () {
 
 # This function uninstalls LAMP, phpmyadmin and git
 lamp_php_uninstall () {
-    echo "${yellow}Uninstalling LAMP may take a while. Please wait patiently. Do not quite the process otherwise you might break your system.${clear}"
+    echo -e "${yellow}Uninstalling LAMP may take a while. Please wait patiently. Do not quite the process otherwise you might break your system.${clear}"
     uninstall_apache2
     uninstall_php
     uninstall_mysql
@@ -383,6 +388,9 @@ lamp_php_uninstall () {
 #------------------------------------------------------------------------------
 
 echo -e "${yellow}This script will let you install LAMP with phpmyadmin.\nPlease choose your desired action:${clear}\n"
+
+echo -e "${green}The script version is:$script_version${clear}"
+
 echo -e "1- Installing LAMP with phpmyadmin\n"
 echo -e "2- Uninstalling the LAMP with phpmy admin\n"
 echo -e "3- Creating a database with agent in mysql\n"

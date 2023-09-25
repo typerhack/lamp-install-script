@@ -15,24 +15,29 @@ sudo bash lamp-install.sh
 
 ## Tested on:
 1- win 10 - ubuntu wsl 2 <br>
-2- ubuntu 22.04
-3- bodhi linux 7.0.0
+2- ubuntu 22.04<br>
+3- bodhi linux 7.0.0<br>
 
+
+## Issues
+1- Currently the root pass configuration not working as it should<br>
+2- Also brute force method for changing mysql password is not working<br>
 
 ## To do:
-1- Must add support for OS differentiation
-2- Must add database, table and agent creation in mysql
+1- Must add support for OS differentiation<br>
+2- Must add database, table and agent creation in mysql<br>
 
 
 ## logs:
 ### v0.2:
-1- Fixed input for the user
-2- Made lamp install automatic no need for user to add anything
-3- Made uninstll process automatic in some parts.
-4- Added OS type check for wsl and ubunto based distros.
-5- Added support for installing VSCode
-6- Fixed bug for vscode running/installation
-7- Fixed system reboot
+1- Fixed input for the user<br>
+2- Made lamp install automatic no need for user to add anything<br>
+3- Made uninstll process automatic in some parts.<br>
+4- Added OS type check for wsl and ubunto based distros.<br>
+5- Added support for installing VSCode<br>
+6- Fixed bug for vscode running/installation<br>
+7- Fixed system reboot<br>
+8- Fixed info.php test creation file<br>
 
 ### v0.1
-raw initialisation of script
+raw initialisation of script<br>
