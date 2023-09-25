@@ -7,6 +7,7 @@ To download the script tou can use the following script
 ```
 curl -O -L https://raw.githubusercontent.com/typerhack/lamp-install-script/main/lamp-install.sh
 chmod +x lamp-install.sh
+
 ```
 Then run:
 ```
@@ -26,9 +27,14 @@ sudo bash lamp-install.sh
 ## To do:
 1- Must add support for OS differentiation<br>
 2- Must add database, table and agent creation in mysql<br>
+3- Adding support for wordpress installation
 
 
 ## logs:
+
+### v0.26
+1- Fixed problem with text log<br>
+2- Fixed problem for databas<br>
 
 ### v0.25:
 1- Fixed input for the user<br>

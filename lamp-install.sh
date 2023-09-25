@@ -100,7 +100,7 @@ checkPassword () {
         echo -e ${green}Passwords matched.${clear}
         echo -e ${yellow}changing mysql root account password...${clear}
         echo
-        mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';"
+        sudo mysql -uroot -ppassword -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';" 
     fi
 }
 
@@ -176,31 +176,28 @@ create_project_shortcut () {
 
 # This function adds necessary user premissions to current user
 add_user_premission () {
-    echo ${yellow}Adding necessary permissions to user...${clear}
+    echo -e ${yellow}Adding necessary permissions to user...${clear}
     sudo chown -R $USER /var/www/html/
     echo "Done!"
 }
 
 # This Function installs git
 git_install () {
-    echo ${yellow}Installing git${clear}
+    echo -e ${yellow}Installing git${clear}
     sudo apt install git-all -y
     echo "Done!"
 }
 
 # This function runs vscode
 run_vscode () {
-    echo "${yellow}Running VSCode server...${clear}"
+    echo -e "${yellow}Running VSCode server...${clear}"
     cd webdev
     code .
 }
 
 # This function installs vscode
 install_vscode () {
-    echo ${yellow}Installing VSCode....${clear}
-
-    sudo apt purge gitweb -y
-    sudo apt install gitweb -y
+    echo -e ${yellow}Installing VSCode....${clear}
 
     sudo apt install wget gpg -y
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
@@ -229,11 +226,13 @@ lamp_php_install () {
     # 1- Upgrading system
     sys_update
 
-    # 2- Installing LAMP    
+    # 2- Installing LAMP 
+    sudo apt purge gitweb -y   
     lamp_install
 
     # 3- Restarting installed services
     service_restart
+    sudo apt install gitweb -y
     
     # 4- Creating test file
     create_test_file
