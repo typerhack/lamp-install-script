@@ -407,6 +407,8 @@ echo -e "6- Restart Services\n"
 echo -e "7- Run VSCode\n"
 echo -e "8- Reboot system\n"
 echo -e "9- Installing VSCode"
+
+echo -e "q- Exit"
 echo
 
 read -p "Choose your option:" option
@@ -438,6 +440,9 @@ case $option in
         ;;
     9)
         install_vscode
+        ;;
+    q)
+        exit
         ;;
 esac
 

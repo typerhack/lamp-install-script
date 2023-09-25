@@ -35,6 +35,7 @@ sudo bash lamp-install.sh
 ### v0.26
 1- Fixed problem with text log<br>
 2- Fixed problem for databas<br>
+3- Added exit option to the script
 
 ### v0.25:
 1- Fixed input for the user<br>
