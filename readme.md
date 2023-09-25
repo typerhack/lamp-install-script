@@ -6,7 +6,7 @@ This is currently tested on win 10 wsl ubuntu.
 To download the script tou can use the following script
 ```
 curl -O -L https://raw.githubusercontent.com/typerhack/lamp-install-script/main/lamp-install.sh
-chmod +x openvpn-install.sh
+chmod +x lamp-install.sh
 ```
 Then run:
 ```
@@ -29,6 +29,9 @@ sudo bash lamp-install.sh
 1- Fixed input for the user
 2- Made lamp install automatic no need for user to add anything
 3- Made uninstll process automatic in some parts.
+4- Added OS type check for wsl and ubunto based distros.
+5- Added support for installing VSCode
+6- Fixed bug for vscode running/installation
 
 ### v0.1
 raw initialisation of script

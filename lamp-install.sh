@@ -2,6 +2,7 @@
 
 # Give the necessary premisions to the file using "chmod +x lamp-install.sh"
 # To run the script use "sudo ./lamp-install.sh"
+#------------------------------------------------------------------------------
 
 # Color variables
 red='\033[0;31m'
@@ -12,6 +13,30 @@ magenta='\033[0;35m'
 cyan='\033[0;36m'
 # Clear the color after that
 clear='\033[0m'
+#------------------------------------------------------------------------------
+
+# Cheking OS
+echo -e "${yellow}What is your OS:${clear}"
+echo -e "${yellow}1- Windows wsl${clear}"
+echo -e "${yellow}2- Ubuntu based linux${clear}"
+read -p "Choose your OS type:" os_type
+while [[ "$os_type" -ne 1 && "$os_type" -ne 2 ]]
+do
+    echo -e ${red}You have to choose your OS type.${clear}
+    echo -e "${yellow}What is your OS:${clear}"
+    echo -e "${yellow}1- Windows wsl${clear}"
+    echo -e "${yellow}2- Ubuntu based linux${clear}"
+    read -p "Choose your OS type:" os_type
+done
+case $os_type in
+    1)
+        echo You have chosen wsl.
+        echo -e ${yellow}It is recommended to use wsl 2. For more information check the following website: https://learn.microsoft.com/en-us/windows/wsl/install${clear}
+        ;;
+    2)
+        echo you have choosen Ubuntu.
+        ;;
+esac
 
 
 #------------------------------------------------------------------------------
@@ -169,6 +194,19 @@ run_vscode () {
     code .
 }
 
+# This function installs vscode
+install_vscode () {
+    echo Installing VSCode....
+    sudo apt-get install wget gpg
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+    sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+    sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+    rm -f packages.microsoft.gpg
+    sudo apt install apt-transport-https
+    sudo apt update
+    sudo apt install code
+    echo "Done!"
+}
 
 
 # This function create a database with associated agent in mysql
@@ -211,21 +249,50 @@ lamp_php_install () {
     echo "${green}LAMP successfully installed!${clear}"
 
     # 10- Running vs code server
-    read -p "${yellow}Do you want to run VS code?[y/n]${clear}"  vscode_answer
-    while [ $vscode_answer != 'y' || $vscode_answer != 'Y' || $vscode_answer != 'n' || $vscode_answer != 'N']
-    do
+    case $os_type in
+    1)
+        read -p "Do you want to run VS code?[y/n]"  vscode_answer
+        while [[ $vscode_answer != y && $vscode_answer != Y && $vscode_answer != n && $vscode_answer != N ]]
+        do
+            
+            echo -e ${red}You must choose y/n only.${clear}
+            read -p "Do you want to run VS code?[y/n]"  vscode_answer
+        done
+
+
         case $vscode_answer in
         y|Y)
-            run_vscode
+            echo "Running VS Code server..."
+            # run_vscode
             ;;
         n|N)
-            exit
+            echo "Done. Enjoy developing for web."
             ;;
-        *)
-        echo -e "${red}Please only enter "y\|Y" or "n\|N".${clear}"
-        ;;
         esac
-    done
+        
+        
+        ;;
+    2)
+        read -p "Do you want to install VS code?[y/n]"  vscode_install
+        while [[ $vscode_install != y && $vscode_install != Y && $vscode_install != n && $vscode_install != N ]]
+        do
+            echo -e ${red}You must choose y/n only.${clear}
+            read -p "Do you want to install VS code?[y/n]"  vscode_install
+        done
+
+        case $vscode_install in
+        y|Y)
+            echo "Installing VS Code..."
+            # install_vscode
+            ;;
+        n|N)
+            echo "Done. Enjoy developing for web."
+            ;;
+        esac        
+        ;;
+    esac
+
+    
 
 }
 
@@ -319,6 +386,7 @@ echo -e "5- Installing git only\n"
 echo -e "6- Restart Services\n"
 echo -e "7- Run VSCode\n"
 echo -e "8- Reboot system\n"
+echo -e "9- Installing VSCode"
 echo
 
 read -p "Choose your option:" option
@@ -347,6 +415,9 @@ case $option in
         ;;
     8)
         system_reboot
+        ;;
+    9)
+        install_vscode
         ;;
 esac
 
