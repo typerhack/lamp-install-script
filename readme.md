@@ -22,7 +22,7 @@ When asked for phpmyadmin use following configs:
 ## Tested on:
 1- win 10 - ubuntu wsl 2 <br>
 2- ubuntu 22.04<br>
-3- bodhi linux 7.0.0<br>
+3- Bodhi linux 7.0.0 (Ubuntu based linux)<br>
 
 
 ## Issues
@@ -30,8 +30,9 @@ When asked for phpmyadmin use following configs:
 
 ## To do:
 1- Must add support for OS differentiation<br>
-2- Must add database, table and agent creation in mysql<br>
-3- Adding support for wordpress installation<br>
+2- automatic wordpress installation with creating database and adding agent<br>
+3- Enhancing wordpress performance<br>
+
 
 
 ## logs:
@@ -68,4 +69,4 @@ When asked for phpmyadmin use following configs:
 15- Added support for removing symbolic link whil uninstalling LAMP <br>
 
 ### v0.1
-raw initialisation of script<br>
+Core initialisation of script<br>
