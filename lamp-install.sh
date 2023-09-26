@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.27.3"
+script_version="0.28.0"
 
 #------------------------------------------------------------------------------
 
@@ -378,6 +378,17 @@ lamp_php_install () {
 
 }
 
+# This function installs wordpress core
+install_wordpress () {
+    echo -e "What is your wordpress project name? (no spaces)"
+    read -p "Wordpress project nema: " wpname
+    sudo mkdir /var/www/html/$wpname
+    sudo wget -P /var/www/html/$wpname https://wordpress.org/latest.tar.gz
+    sudo tar -xzvf /var/www/html/$wpname/latest.tar.gz -C /var/www/html/$wpname --strip-components=1
+    sudo rm /var/www/html/$wpname/latest.tar.gz
+
+}
+
 # This function uninstalls git
 git_uninstall (){
     echo Uninstalling git...
@@ -477,11 +488,12 @@ echo 2- Uninstalling the LAMP with phpmy admin
 echo 3- Add new user to mysql
 echo 4- Changing mysql root password
 echo 5- Create database with agent in mysql
-echo 6- Installing git only
+echo 6- Install git only
 echo 7- Restart Services
 echo 8- Run VSCode
 echo 9- Reboot system
-echo 10- Installing VSCode
+echo 10- Install VSCode
+echo 11- Install wordpress core
 
 echo q- Exit
 echo
@@ -518,6 +530,9 @@ case $option in
         ;;
     10)
         install_vscode
+        ;;
+    11)
+        install_wordpress
         ;;
     q)
         exit

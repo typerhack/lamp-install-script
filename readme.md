@@ -17,7 +17,7 @@ sudo bash lamp-install.sh
 When asked for phpmyadmin use following configs:
 > Use apache2 <br>
 > Configure db with dbconfig-common: No <br>
-> If any error occured choose : iqnore<br>
+> If any error occured choose : ignore<br>
 
 ## Tested on:
 1- win 10 - ubuntu wsl 2 <br>
@@ -35,6 +35,9 @@ When asked for phpmyadmin use following configs:
 
 
 ## logs:
+
+### 0.28.0
+1- Added support for installing wordpress core
 
 ### v0.27.3
 1- Fixed problem with text log<br>
