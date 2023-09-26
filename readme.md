@@ -15,9 +15,9 @@ sudo bash lamp-install.sh
 ```
 
 When asked for phpmyadmin use following configs:
-> > Use apache2 <br>
-> > Configure db with dbconfig-common: No <br>
-> > If any error occured choose : iqnore<br>
+> Use apache2 <br>
+> Configure db with dbconfig-common: No <br>
+> If any error occured choose : iqnore<br>
 
 ## Tested on:
 1- win 10 - ubuntu wsl 2 <br>
@@ -36,14 +36,15 @@ When asked for phpmyadmin use following configs:
 
 ## logs:
 
-### v0.27.2
+### v0.27.3
 1- Fixed problem with text log<br>
 2- Fixed problem for databas<br>
 3- Added exit option to the script<br>
 4- Fixed $HOME address for the script<br>
 5- Removing limits for root user to access phpmyadmin panel<br>
 6- added support for creating new user - not fully completed<br>
-7- Fixed the opton name for adding new user to mysql
+7- Fixed the opton name for adding new user to mysql<br>
+8- Added support for createing database with associated agent in mysql<br>
 
 
 ### v0.25:

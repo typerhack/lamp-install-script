@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.27.2"
+script_version="0.27.3"
 
 #------------------------------------------------------------------------------
 
@@ -252,7 +252,47 @@ create_database_agent_mysql () {
     
 }
 
+# This function creates a database with agent
+create_database_with_agent () {
+    ech0 -e "${yellow}Initialising... Please answer some questions:${clear}"
 
+    read -p "What is your database name?" new_database_name
+    read -p "What is the username to associate with database?" new_database_user
+
+    new_database_user_pass () {
+        echo -e ${yellow}Please specify a password for your root account:${clear}
+        read -sp "New user password:" newdatabaseuserpass
+        echo
+        read -sp "confirm password:" newdatabaseuserpassconfirm
+        echo
+        
+        while [ $newdatabaseuserpass != newdatabaseuserpassconfirm ]
+        do
+            echo -e ${yellow}Password do not match....${clear}
+            new_database_user_pass
+        done
+
+    }
+    new_database_user_pass
+
+    if [ $newusermysqlpass = $newusermysqlpassconfirm ]
+    then
+        echo ${yellow}What is your root account password:${clear}
+        read -sp "root account password:" newuserrootuserpass
+
+        echo -e "${yellow}Creating database...${clear}"
+        echo -e "${yellow}Creating agent...${clear}"
+        echo -e "${yellow}Associating database with agent...${clear}"
+
+        sudo mysql -uroot -p$newuserrootuserpass -e"CREATE DATABASE $new_database_name;USE $new_database_name;CREATE USER '$new_database_user'@'localhost' IDENTIFIED BY '$newdatabaseuserpass';GRANT ALL PRIVILEGES ON $new_database_name.* TO '$new_database_user'@'localhost';FLUSH PRIVILEGES;"
+
+        echo "Done!"
+        
+        service_restart
+    fi
+
+    
+}
 
 
 # This function install LAMP, phpmyadmin and git
@@ -429,21 +469,21 @@ lamp_php_uninstall () {
 }
 #------------------------------------------------------------------------------
 
+echo -e "${green}The script version is: $script_version${clear}\n"
 echo -e "${yellow}This script will let you install LAMP with phpmyadmin.\nPlease choose your desired action:${clear}\n"
 
-echo -e "${green}The script version is: $script_version${clear}"
+echo 1- Installing LAMP with phpmyadmin
+echo 2- Uninstalling the LAMP with phpmy admin
+echo 3- Add new user to mysql
+echo 4- Changing mysql root password
+echo 5- Create database with agent in mysql
+echo 6- Installing git only
+echo 7- Restart Services
+echo 8- Run VSCode
+echo 9- Reboot system
+echo 10- Installing VSCode
 
-echo -e "1- Installing LAMP with phpmyadmin\n"
-echo -e "2- Uninstalling the LAMP with phpmy admin\n"
-echo -e "3- ADd new user to mysql\n"
-echo -e "4- Changing mysql root password\n"
-echo -e "5- Installing git only\n"
-echo -e "6- Restart Services\n"
-echo -e "7- Run VSCode\n"
-echo -e "8- Reboot system\n"
-echo -e "9- Installing VSCode\n"
-
-echo -e "q- Exit\n"
+echo q- Exit
 echo
 
 read -p "Choose your option:" option
@@ -462,31 +502,24 @@ case $option in
         change_root_pass_brute
         ;;
     5)
-        git_install
+        create_database_with_agent
         ;;
     6)
-        service_restart
+        git_install
         ;;
     7)
-        run_vscode
+        service_restart
         ;;
     8)
-        system_reboot
+        run_vscode
         ;;
     9)
+        system_reboot
+        ;;
+    10)
         install_vscode
         ;;
     q)
         exit
         ;;
 esac
-
-
-
-
-
-
-
-
-
-
