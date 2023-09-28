@@ -32,13 +32,18 @@ When asked for phpmyadmin use following configs:
 1- Must add support for OS differentiation<br>
 2- automatic wordpress installation with creating database and adding agent<br>
 3- Enhancing wordpress performance<br>
-
+4- Adding DNS fix for wsl using "etc/resolve.conf"<br>
 
 
 ## logs:
 
+## 0.29.0
+1- Fixed permissions for wordpress installation<br>
+2- Fixed some typing mistakes<br>
+3- Fixed problem for creating new user in mysql for matching passwords
+
 ### 0.28.0
-1- Added support for installing wordpress core
+1- Added support for installing wordpress core <br>
 
 ### v0.27.3
 1- Fixed problem with text log<br>

@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.28.0"
+script_version="0.29.0"
 
 #------------------------------------------------------------------------------
 
@@ -163,6 +163,7 @@ phpmyadmin_install () {
     sudo apt-get install -y phpmyadmin
 
     # Adding phpmyadmin to apache2
+    echo "# This lines adds phpmyadmin to apache2" >> /etc/apache2/apache2.conf
     echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf
     service_restart
     echo You can now use phpmyadmin via ${green}localhost/phpmyadmin${clear} using your ${green}root${clear} username and specified password.
@@ -254,19 +255,19 @@ create_database_agent_mysql () {
 
 # This function creates a database with agent
 create_database_with_agent () {
-    ech0 -e "${yellow}Initialising... Please answer some questions:${clear}"
+    ech0 -e "${yellow}Initialising... Please provide us with some data:${clear}"
 
     read -p "What is your database name?" new_database_name
     read -p "What is the username to associate with database?" new_database_user
 
     new_database_user_pass () {
-        echo -e ${yellow}Please specify a password for your root account:${clear}
+        echo -e ${yellow}Please enter a password  fof $new_database_user:${clear}
         read -sp "New user password:" newdatabaseuserpass
         echo
         read -sp "confirm password:" newdatabaseuserpassconfirm
         echo
         
-        while [ $newdatabaseuserpass != newdatabaseuserpassconfirm ]
+        while [ $newdatabaseuserpass != $newdatabaseuserpassconfirm ]
         do
             echo -e ${yellow}Password do not match....${clear}
             new_database_user_pass
@@ -381,11 +382,25 @@ lamp_php_install () {
 # This function installs wordpress core
 install_wordpress () {
     echo -e "What is your wordpress project name? (no spaces)"
-    read -p "Wordpress project nema: " wpname
+    read -p "Wordpress project name: " wpname
     sudo mkdir /var/www/html/$wpname
     sudo wget -P /var/www/html/$wpname https://wordpress.org/latest.tar.gz
     sudo tar -xzvf /var/www/html/$wpname/latest.tar.gz -C /var/www/html/$wpname --strip-components=1
     sudo rm /var/www/html/$wpname/latest.tar.gz
+
+    echo -e "${yellow}Adding necessary permissions...${clear}"
+    cd /var/www/html/$wpname
+    sudo chown -R www-data:www-data /var/www/html/$wpname
+    sudo chmod -R 755 /var/www/html/$wpname
+
+    echo -e "${yellow}Adding necessary configs to apache2...${clear}"
+    sudo systemctl stop apache2
+    echo -e "<Directory /var/www/html/$wpname>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All\n\tRequire all granted\n</Directory>" >> /etc/apache2/apache2.conf
+    sudo systemctl start apache2
+    service_restart
+    echo -e "${green}Wordpress Installed.${clear}"
+
+    echo "Done!"
 
 }
 
@@ -490,7 +505,7 @@ echo 4- Changing mysql root password
 echo 5- Create database with agent in mysql
 echo 6- Install git only
 echo 7- Restart Services
-echo 8- Run VSCode
+echo 8- Run VSCo de
 echo 9- Reboot system
 echo 10- Install VSCode
 echo 11- Install wordpress core
