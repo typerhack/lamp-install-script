@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.29.0"
+script_version="0.29.1"
 
 #------------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ create_database_with_agent () {
     read -p "What is the username to associate with database?" new_database_user
 
     new_database_user_pass () {
-        echo -e ${yellow}Please enter a password  fof $new_database_user:${clear}
+        echo -e ${yellow}Please enter a password  for \"$new_database_user\":${clear}
         read -sp "New user password:" newdatabaseuserpass
         echo
         read -sp "confirm password:" newdatabaseuserpassconfirm
@@ -278,7 +278,7 @@ create_database_with_agent () {
 
     if [ $newusermysqlpass = $newusermysqlpassconfirm ]
     then
-        echo ${yellow}What is your root account password:${clear}
+        echo -e ${yellow}What is your root account password:${clear}
         read -sp "root account password:" newuserrootuserpass
 
         echo -e "${yellow}Creating database...${clear}"
