@@ -37,10 +37,11 @@ When asked for phpmyadmin use following configs:
 
 ## logs:
 
-## 0.29.0
+## 0.29.2
 1- Fixed permissions for wordpress installation<br>
 2- Fixed some typing mistakes<br>
-3- Fixed problem for creating new user in mysql for matching passwords
+3- Fixed problem for creating new user in mysql for matching passwords<br>
+4- Fixed some bugs
 
 ### 0.28.0
 1- Added support for installing wordpress core <br>

@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.29.1"
+script_version="0.29.2"
 
 #------------------------------------------------------------------------------
 
@@ -399,7 +399,7 @@ install_wordpress () {
     sudo systemctl start apache2
     service_restart
     echo -e "${green}Wordpress Installed.${clear}"
-
+    cd $HOME
     echo "Done!"
 
 }
