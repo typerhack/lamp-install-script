@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.29.2"
+script_version="0.29.3"
 
 #------------------------------------------------------------------------------
 
@@ -173,6 +173,7 @@ phpmyadmin_install () {
 # Add projects shortcut to home as a symbolic link
 create_project_shortcut () {
     echo -e ${cyan}Adding webdev shortcuts to home as a symbolic link${clear}.
+    echo -e "${yellow}It the shorcut did not created, please use the following command for adding shortcut for your projects to your $HOME: \"sudo ln -s /var/www/html $HOME/webdev\""
     sudo ln -s /var/www/html $HOME/webdev
     echo -e "${green}You can now access your file via webdev folder.${clear}"
     echo -e "Done!"
@@ -400,6 +401,14 @@ install_wordpress () {
     service_restart
     echo -e "${green}Wordpress Installed.${clear}"
     cd $HOME
+
+    echo -e "${yellow}Adding necessary permissions to user for adding/editing files and folders...${clear}"
+    current_username=$(whoami)
+    echo "The current username is: $current_username"
+    sudo chown -R $current_username:$current_username /var/www/html/$wpname
+    sudo chmod -R 755 /var/www/html/$wpname
+
+
     echo "Done!"
 
 }

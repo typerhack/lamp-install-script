@@ -43,12 +43,14 @@ When asked for phpmyadmin use following configs:
 
 ## logs:
 
-### v0.29.2
+### v0.29.3
 
 1- Fixed permissions for wordpress installation<br>
 2- Fixed some typing mistakes<br>
 3- Fixed problem for creating new user in mysql for matching passwords<br>
 4- Fixed some bugs
+5- Granted permissions to current user for adding files and folders in wordpress <br>
+6- Added a prompt for creating shortcuts to the home directory<br>
 
 ### v0.28.0
 
