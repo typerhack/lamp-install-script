@@ -270,7 +270,7 @@ create_database_with_agent () {
         
         while [ $newdatabaseuserpass != $newdatabaseuserpassconfirm ]
         do
-            echo -e ${yellow}Password do not match....${clear}
+            echo -e ${yellow}Passwords do not match....${clear}
             new_database_user_pass
         done
 
