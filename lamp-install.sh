@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Give the necessary premisions to the file using "chmod +x lamp-install.sh"
-# To run the script use "sudo ./lamp-install.sh"
+# To run the script use "./lamp-install.sh"
 
 #------------------------------------------------------------------------------
 
 # Script Version
-script_version="0.29.3"
+script_version="0.30.0"
 
 #------------------------------------------------------------------------------
 
@@ -21,12 +21,39 @@ cyan='\033[0;36m'
 clear='\033[0m'
 #------------------------------------------------------------------------------
 
+invoking_user="${SUDO_USER:-$USER}"
+invoking_home="$(eval echo "~$invoking_user")"
+
+#------------------------------------------------------------------------------
+
+append_if_missing () {
+    local line="$1"
+    local file="$2"
+
+    if ! sudo grep -Fqx "$line" "$file"; then
+        echo "$line" | sudo tee -a "$file" >/dev/null
+    fi
+}
+
+sql_escape () {
+    local value="$1"
+    printf "%s" "${value//\'/\'\'}"
+}
+
+validate_mysql_identifier () {
+    local value="$1"
+    if [[ ! "$value" =~ ^[A-Za-z0-9_]+$ ]]; then
+        echo -e "${red}Only letters, numbers, and underscores are allowed.${clear}"
+        return 1
+    fi
+}
+
 # Cheking OS
 echo -e "${yellow}What is your OS:${clear}"
 echo -e "${yellow}1- Windows wsl${clear}"
 echo -e "${yellow}2- Ubuntu based linux${clear}"
 read -p "Choose your OS type:" os_type
-while [[ "$os_type" -ne 1 && "$os_type" -ne 2 ]]
+while [[ ! "$os_type" =~ ^[12]$ ]]
 do
     echo -e ${red}You have to choose your OS type.${clear}
     echo -e "${yellow}What is your OS:${clear}"
@@ -61,7 +88,9 @@ lamp_install () {
 
     # Editing apache2.conf
     echo -e ${yellow}Adding necessary lines to apache2.conf.${clear}
-    echo -e "Servername localhost\nAcceptFilter http none\nAcceptFilter https none" >> /etc/apache2/apache2.conf
+    append_if_missing "ServerName localhost" /etc/apache2/apache2.conf
+    append_if_missing "AcceptFilter http none" /etc/apache2/apache2.conf
+    append_if_missing "AcceptFilter https none" /etc/apache2/apache2.conf
     echo -e ${green}LAMP installed.${clear}
 }
 
@@ -80,8 +109,8 @@ service_restart () {
 # This function creates a test file
 create_test_file () {
     echo -e ${cyan}Creating test file...${clear}
-    touch /var/www/html/info.php
-    echo -e "<?php\nphpinfo();\n?>" > /var/www/html/info.php
+    sudo touch /var/www/html/info.php
+    echo -e "<?php\nphpinfo();\n?>" | sudo tee /var/www/html/info.php >/dev/null
     echo -e To check your test file please visit the following address: ${green}localhost/info.php${clear}
     echo "Done!"
 }
@@ -90,17 +119,18 @@ create_test_file () {
 checkPassword () {
     echo
     echo -e ${yellow}Please specify a password for your root account:${clear}
-    read -sp "mysql password:" passvar
+    read -r -s -p "mysql password:" passvar
     echo
-    read -sp "confirm password:" passvarconfirm
+    read -r -s -p "confirm password:" passvarconfirm
     echo
-    if [ $passvar = $passvarconfirm ]
+    if [ "$passvar" = "$passvarconfirm" ]
     then
         echo
         echo -e ${green}Passwords matched.${clear}
         echo -e ${yellow}changing mysql root account password...${clear}
         echo -e "${yellow}Removing root user limits...${clear}"
-        sudo mysql -uroot -e"ALTER USER 'root'@'localhost' IDENTIFIED BY '$passvar';UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root';FLUSH PRIVILEGES;" 
+        escaped_pass="$(sql_escape "$passvar")"
+        sudo mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$escaped_pass';UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root';FLUSH PRIVILEGES;"
         echo "Done!"
 
         service_restart
@@ -112,7 +142,7 @@ change_root_pass () {
     echo -e "${yellow}You must change mysql root account password."${clear}
 
     checkPassword
-    while [ $passvar != $passvarconfirm ]
+    while [ "$passvar" != "$passvarconfirm" ]
     do
         echo -e ${red}Passwords did not match...${clear}
         echo
@@ -123,38 +153,31 @@ change_root_pass () {
 
 # This function changes the root username password using brute force method
 change_root_pass_brute () {
+    echo
+    echo -e ${yellow}Please enter your current mysql root password:${clear}
+    read -r -s -p "current mysql password:" current_root_pass
+    echo
 
-    echo
-    echo -e ${yellow}Please specify a password for your root account:${clear}
-    read -sp "mysql password:" newpassvar
-    echo
-    read -sp "confirm password:" newpassvarconfirm
-    echo
-    confirm_new_pass () {
-        if [ $newpassvar = $newpassvarconfirm ]
-        then
-            echo ${yellow}Stopping mysql.service...${clear}
-            sudo systemctl stop mysql
-            echo ${yellow}Bypassing password...${clear}
-            sudo mysqld_safe --skip-grant-tables &
-            echo ${yellow}Starting mysql.service...${clear}
-            sudo systemctl start mysql
-            echo ${yellow}Changing root user password${clear}
-            mysql -u root -e "USE mysql;UPDATE user SET authentication_string = PASSWORD('$newpassvar') WHERE User = 'root';FLUSH PRIVILEGES;"
-            echo ${yellow}Restarting mysql.service...${clear}
-            sudo systemctl restart mysql
-            echo ${green} Root password changed.${clear}
-            echo "Done!"
-        fi
-    }
-    while [ $newpassvar != $newpassvarconfirm ]
+    while true
     do
-        echo -e ${red}Passwords did not match...${clear}
+        echo -e ${yellow}Please specify a new password for your root account:${clear}
+        read -r -s -p "new mysql password:" newpassvar
         echo
+        read -r -s -p "confirm new password:" newpassvarconfirm
         echo
-        confirm_new_pass
+
+        if [ "$newpassvar" = "$newpassvarconfirm" ]; then
+            break
+        fi
+
+        echo -e ${red}Passwords did not match. Try again...${clear}
     done
 
+    escaped_newpass="$(sql_escape "$newpassvar")"
+    sudo mysql -uroot -p"$current_root_pass" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$escaped_newpass';FLUSH PRIVILEGES;"
+    service_restart
+    echo -e ${green}Root password changed.${clear}
+    echo "Done!"
 }
 
 # This function installs phpmyadmin and changes necessary configs
@@ -163,8 +186,8 @@ phpmyadmin_install () {
     sudo apt-get install -y phpmyadmin
 
     # Adding phpmyadmin to apache2
-    echo "# This lines adds phpmyadmin to apache2" >> /etc/apache2/apache2.conf
-    echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf
+    append_if_missing "# This lines adds phpmyadmin to apache2" /etc/apache2/apache2.conf
+    append_if_missing "Include /etc/phpmyadmin/apache.conf" /etc/apache2/apache2.conf
     service_restart
     echo You can now use phpmyadmin via ${green}localhost/phpmyadmin${clear} using your ${green}root${clear} username and specified password.
     echo "Done!"
@@ -173,8 +196,12 @@ phpmyadmin_install () {
 # Add projects shortcut to home as a symbolic link
 create_project_shortcut () {
     echo -e ${cyan}Adding webdev shortcuts to home as a symbolic link${clear}.
-    echo -e "${yellow}It the shorcut did not created, please use the following command for adding shortcut for your projects to your $HOME: \"sudo ln -s /var/www/html $HOME/webdev\""
-    sudo ln -s /var/www/html $HOME/webdev
+    echo -e "${yellow}If the shortcut was not created, please use: \"ln -s /var/www/html $invoking_home/webdev\"${clear}"
+    if [ -L "$invoking_home/webdev" ] || [ -e "$invoking_home/webdev" ]; then
+        echo -e "${yellow}Shortcut already exists at $invoking_home/webdev.${clear}"
+    else
+        sudo ln -s /var/www/html "$invoking_home/webdev"
+    fi
     echo -e "${green}You can now access your file via webdev folder.${clear}"
     echo -e "Done!"
 }
@@ -182,7 +209,7 @@ create_project_shortcut () {
 # This function adds necessary user premissions to current user
 add_user_premission () {
     echo -e ${yellow}Adding necessary permissions to user...${clear}
-    sudo chown -R $USER /var/www/html/
+    sudo chown -R "$invoking_user":"$invoking_user" /var/www/html/
     echo "Done!"
 }
 
@@ -196,7 +223,10 @@ git_install () {
 # This function runs vscode
 run_vscode () {
     echo -e "${yellow}Running VSCode server...${clear}"
-    cd webdev
+    cd "$invoking_home/webdev" || {
+        echo -e "${red}webdev shortcut was not found at $invoking_home/webdev.${clear}"
+        return 1
+    }
     code .
 }
 
@@ -221,31 +251,34 @@ install_vscode () {
 create_database_agent_mysql () {
 
     echo -e ${yellow}Please enter a new username for mysql:${clear}
-    read -p "New username:" newusermysql
+    read -r -p "New username:" newusermysql
+    validate_mysql_identifier "$newusermysql" || return 1
 
     new_mysql_user_pass () {
         echo -e ${yellow}Please specify a password for your root account:${clear}
-        read -sp "New user password:" newusermysqlpass
+        read -r -s -p "New user password:" newusermysqlpass
         echo
-        read -sp "confirm password:" newusermysqlpassconfirm
+        read -r -s -p "confirm password:" newusermysqlpassconfirm
         echo
         
 
     }
     new_mysql_user_pass
     
-    while [ $newusermysqlpass != $newusermysqlpassconfirm ]
+    while [ "$newusermysqlpass" != "$newusermysqlpassconfirm" ]
     do
         echo -e ${yellow}Password do not match....${clear}
         new_mysql_user_pass
     done
     
-    if [ $newusermysqlpass = $newusermysqlpassconfirm ]
+    if [ "$newusermysqlpass" = "$newusermysqlpassconfirm" ]
     then
         echo ${yellow}What is your root account password:${clear}
-        read -sp "root account password:" rootuserpass
-        echo -e ${yellow}creating phpmyadmin user...${clear} 
-        sudo mysql -uroot -p$rootuserpass -e"CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$newusermysqlpass';GRANT ALL PRIVILEGES ON yourdatabase.* TO 'phpmyadminuser'@'localhost';FLUSH PRIVILEGES;"
+        read -r -s -p "root account password:" rootuserpass
+        echo
+        echo -e ${yellow}Creating mysql user...${clear}
+        escaped_user_pass="$(sql_escape "$newusermysqlpass")"
+        sudo mysql -uroot -p"$rootuserpass" -e "CREATE USER '$newusermysql'@'localhost' IDENTIFIED BY '$escaped_user_pass';GRANT ALL PRIVILEGES ON *.* TO '$newusermysql'@'localhost';FLUSH PRIVILEGES;"
         
         service_restart
     fi
@@ -256,37 +289,40 @@ create_database_agent_mysql () {
 
 # This function creates a database with agent
 create_database_with_agent () {
-    ech0 -e "${yellow}Initialising... Please provide us with some data:${clear}"
+    echo -e "${yellow}Initialising... Please provide us with some data:${clear}"
 
-    read -p "What is your database name?" new_database_name
-    read -p "What is the username to associate with database?" new_database_user
+    read -r -p "What is your database name?" new_database_name
+    read -r -p "What is the username to associate with database?" new_database_user
+    validate_mysql_identifier "$new_database_name" || return 1
+    validate_mysql_identifier "$new_database_user" || return 1
 
     new_database_user_pass () {
         echo -e ${yellow}Please enter a password  for \"$new_database_user\":${clear}
-        read -sp "New user password:" newdatabaseuserpass
+        read -r -s -p "New user password:" newdatabaseuserpass
         echo
-        read -sp "confirm password:" newdatabaseuserpassconfirm
+        read -r -s -p "confirm password:" newdatabaseuserpassconfirm
         echo
         
-        while [ $newdatabaseuserpass != $newdatabaseuserpassconfirm ]
-        do
-            echo -e ${yellow}Passwords do not match....${clear}
-            new_database_user_pass
-        done
-
     }
     new_database_user_pass
+    while [ "$newdatabaseuserpass" != "$newdatabaseuserpassconfirm" ]
+    do
+        echo -e ${yellow}Passwords do not match....${clear}
+        new_database_user_pass
+    done
 
-    if [ $newusermysqlpass = $newusermysqlpassconfirm ]
+    if [ "$newdatabaseuserpass" = "$newdatabaseuserpassconfirm" ]
     then
         echo -e ${yellow}What is your root account password:${clear}
-        read -sp "root account password:" newuserrootuserpass
+        read -r -s -p "root account password:" newuserrootuserpass
+        echo
 
         echo -e "${yellow}Creating database...${clear}"
         echo -e "${yellow}Creating agent...${clear}"
         echo -e "${yellow}Associating database with agent...${clear}"
 
-        sudo mysql -uroot -p$newuserrootuserpass -e"CREATE DATABASE $new_database_name;USE $new_database_name;CREATE USER '$new_database_user'@'localhost' IDENTIFIED BY '$newdatabaseuserpass';GRANT ALL PRIVILEGES ON $new_database_name.* TO '$new_database_user'@'localhost';FLUSH PRIVILEGES;"
+        escaped_database_user_pass="$(sql_escape "$newdatabaseuserpass")"
+        sudo mysql -uroot -p"$newuserrootuserpass" -e "CREATE DATABASE $new_database_name;USE $new_database_name;CREATE USER '$new_database_user'@'localhost' IDENTIFIED BY '$escaped_database_user_pass';GRANT ALL PRIVILEGES ON $new_database_name.* TO '$new_database_user'@'localhost';FLUSH PRIVILEGES;"
 
         echo "Done!"
         
@@ -383,7 +419,8 @@ lamp_php_install () {
 # This function installs wordpress core
 install_wordpress () {
     echo -e "What is your wordpress project name? (no spaces)"
-    read -p "Wordpress project name: " wpname
+    read -r -p "Wordpress project name: " wpname
+    validate_mysql_identifier "$wpname" || return 1
     sudo mkdir /var/www/html/$wpname
     sudo wget -P /var/www/html/$wpname https://wordpress.org/latest.tar.gz
     sudo tar -xzvf /var/www/html/$wpname/latest.tar.gz -C /var/www/html/$wpname --strip-components=1
@@ -396,16 +433,19 @@ install_wordpress () {
 
     echo -e "${yellow}Adding necessary configs to apache2...${clear}"
     sudo systemctl stop apache2
-    echo -e "<Directory /var/www/html/$wpname>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All\n\tRequire all granted\n</Directory>" >> /etc/apache2/apache2.conf
+    append_if_missing "<Directory /var/www/html/$wpname>" /etc/apache2/apache2.conf
+    append_if_missing "	Options Indexes FollowSymLinks" /etc/apache2/apache2.conf
+    append_if_missing "	AllowOverride All" /etc/apache2/apache2.conf
+    append_if_missing "	Require all granted" /etc/apache2/apache2.conf
+    append_if_missing "</Directory>" /etc/apache2/apache2.conf
     sudo systemctl start apache2
     service_restart
     echo -e "${green}Wordpress Installed.${clear}"
-    cd $HOME
+    cd "$invoking_home" || return 1
 
     echo -e "${yellow}Adding necessary permissions to user for adding/editing files and folders...${clear}"
-    current_username=$(whoami)
-    echo "The current username is: $current_username"
-    sudo chown -R $current_username:$current_username /var/www/html/$wpname
+    echo "The current username is: $invoking_user"
+    sudo chown -R "$invoking_user":"$invoking_user" /var/www/html/$wpname
     sudo chmod -R 755 /var/www/html/$wpname
 
 
@@ -478,7 +518,7 @@ lamp_php_uninstall () {
     uninstall_mysql
 
     #removing project shortcut
-    rm ~/webdev
+    rm -f "$invoking_home/webdev"
 
     echo -e "${yellow}It is recommended to reboot your system. Do you want to reboot your system now?[y|n]${clear}"
     read -p "Reboot now?[y|n]" rebootvar
@@ -514,7 +554,7 @@ echo 4- Changing mysql root password
 echo 5- Create database with agent in mysql
 echo 6- Install git only
 echo 7- Restart Services
-echo 8- Run VSCo de
+echo 8- Run VSCode
 echo 9- Reboot system
 echo 10- Install VSCode
 echo 11- Install wordpress core
